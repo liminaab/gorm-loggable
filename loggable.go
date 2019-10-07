@@ -31,7 +31,7 @@ type LoggableModel struct {
 func (LoggableModel) Meta() interface{} { return nil }
 func (LoggableModel) lock()             {}
 func (l LoggableModel) isEnabled() bool { return !l.Disabled }
-func (l LoggableModel) Enable(v bool)   { l.Disabled = !v }
+func (l *LoggableModel) Enable(v bool)   { l.Disabled = !v }
 
 // ChangeLog is a main entity, which used to log changes.
 // Commonly, ChangeLog is stored in 'change_logs' table.
