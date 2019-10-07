@@ -103,6 +103,10 @@ func interfaceToString(v interface{}) string {
 	switch val := v.(type) {
 	case string:
 		return val
+	case *string:
+		return *val
+	case *int64:
+		return fmt.Sprint(*val)
 	default:
 		return fmt.Sprint(v)
 	}
