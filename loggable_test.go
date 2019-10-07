@@ -34,11 +34,11 @@ func TestMain(m *testing.M) {
 		"postgres",
 		fmt.Sprintf(
 			"postgres://%s:%s@%s:%d/%s?sslmode=disable",
-			"root",
-			"keepitsimple",
+			"postgres",
+			"postgres",
 			"localhost",
 			5432,
-			"loggable",
+			"loggable_test",
 		),
 	)
 	if err != nil {
