@@ -62,9 +62,13 @@ func (p *Plugin) addUpdated(scope *gorm.Scope) {
 	}
 
 	if p.opts.lazyUpdate {
+		fieldsToIgnore := p.opts.lazyUpdateFields
+		fieldsWithIgnoreTag := getLoggableFieldNamesForIgnore(scope.Value)
+		fieldsToIgnore = append(fieldsToIgnore, fieldsWithIgnoreTag...)
+
 		record, err := p.GetLastRecord(interfaceToString(scope.PrimaryKeyValue()), false)
 		if err == nil {
-			if isEqual(record.RawObject, scope.Value, p.opts.lazyUpdateFields...) {
+			if isEqual(record.RawObject, scope.Value, fieldsToIgnore...) {
 				return
 			}
 		}
@@ -141,7 +145,7 @@ func computeUpdateDiff(scope *gorm.Scope) UpdateDiff {
 
 	ov := reflect.ValueOf(old)
 	nv := reflect.Indirect(reflect.ValueOf(scope.Value))
-	names := getLoggableFieldNames(old)
+	names := getLoggableFieldNamesForDiff(old)
 
 	diff := make(UpdateDiff)
 
