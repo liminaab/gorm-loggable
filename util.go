@@ -104,7 +104,8 @@ func getLoggableFieldNamesForIgnore(value interface{}) []string {
 func getLoggableFieldNames(tag string, value interface{}) []string {
 	var names []string
 
-	t := reflect.TypeOf(value)
+	t := reflect.TypeOf(value).Elem()
+
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		value, ok := field.Tag.Lookup(tag)
