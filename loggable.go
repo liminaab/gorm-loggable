@@ -39,38 +39,38 @@ type Changelogs []ChangeLog
 // Commonly, ChangeLog is stored in 'change_logs' table.
 type ChangeLog struct {
 	// Primary key of change logs.
-	ID uuid.UUID `gorm:"primary_key;"`
+	ID uuid.UUID `gorm:"primary_key;" json:"id"`
 	// Timestamp, when change log was created.
-	CreatedAt time.Time `sql:"DEFAULT:current_timestamp"`
+	CreatedAt time.Time `sql:"DEFAULT:current_timestamp" json:"created_at"`
 	// Action type.
 	// On write, supports only 'create', 'update', 'delete',
 	// but on read can be anything.
-	Action string
+	Action string `json:"action"`
 	// ID of tracking object.
 	// By this ID later you can find all object (database row) changes.
-	ObjectID string `gorm:"index"`
+	ObjectID string `gorm:"index" json:"object_id"`
 	// Reflect name of tracking object.
 	// It does not use package or module name, so
 	// it may be not unique when use multiple types from different packages but with the same name.
-	ObjectType string `gorm:"index"`
+	ObjectType string `gorm:"index" json:"object_type"`
 	// Raw representation of tracking object.
 	// todo(@sas1024): Replace with []byte, to reduce allocations. Would be major version.
-	RawObject string `sql:"type:JSON"`
+	RawObject string `sql:"type:JSON" json:"raw_object"`
 	// Raw representation of tracking object's meta.
 	// todo(@sas1024): Replace with []byte, to reduce allocations. Would be major version.
-	RawMeta string `sql:"type:JSON"`
+	RawMeta string `sql:"type:JSON" json:"raw_meta"`
 	// Raw representation of diff's.
 	// todo(@sas1024): Replace with []byte, to reduce allocations. Would be major version.
-	RawDiff string `sql:"type:JSON"`
+	RawDiff string `sql:"type:JSON" json:"raw_diff"`
 	// Free field to store something you want, e.g. who creates change log.
 	// Not used field in gorm-loggable, but gorm tracks this field.
-	CreatedBy string `gorm:"index"`
+	CreatedBy string `gorm:"index" json:"created_by"`
 	// Field Object would contain prepared structure, parsed from RawObject as json.
 	// Use RegObjectType to register object types.
-	Object interface{} `sql:"-"`
+	Object interface{} `sql:"-" json:"object"`
 	// Field Meta would contain prepared structure, parsed from RawMeta as json.
 	// Use RegMetaType to register object's meta types.
-	Meta interface{} `sql:"-"`
+	Meta interface{} `sql:"-" json:"meta"`
 }
 
 func (l *ChangeLog) prepareObject(objType reflect.Type) error {
