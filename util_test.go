@@ -1,6 +1,8 @@
 package loggable
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestToSnakeCase(t *testing.T) {
 
