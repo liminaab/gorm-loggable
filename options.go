@@ -47,6 +47,18 @@ func RegObjectType(objectType string, objectStruct interface{}) Option {
 	}
 }
 
+func RegObjectTypes(objectMap map[string]interface{}) Option {
+	return func(options *options) {
+		if options.objectTypes == nil {
+			options.objectTypes = make(map[string]reflect.Type)
+		}
+
+		for t, v := range objectMap {
+			options.objectTypes[t] = reflect.Indirect(reflect.ValueOf(v)).Type()
+		}
+	}
+}
+
 // RegMetaType works like RegObjectType, but for field RawMeta.
 // RegMetaType maps object to type name, that is used in field Type of ChangeLog struct.
 // On read change log operations, if plugin finds registered object type, by its name from db,
