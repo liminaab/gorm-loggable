@@ -66,7 +66,7 @@ func (p *Plugin) addUpdated(scope *gorm.Scope) {
 		fieldsWithIgnoreTag := getLoggableFieldNamesForIgnore(scope.Value)
 		fieldsToIgnore = append(fieldsToIgnore, fieldsWithIgnoreTag...)
 
-		record, err := p.GetLastRecord(interfaceToString(scope.PrimaryKeyValue()), false)
+		record, err := p.GetLastRecord(interfaceToString(scope.PrimaryKeyValue()), scope.GetModelStruct().ModelType.Name(), false)
 		if err == nil {
 			if isEqual(record.RawObject, scope.Value, fieldsToIgnore...) {
 				return

@@ -33,7 +33,7 @@ func Register(db *gorm.DB, opts ...Option) (Plugin, error) {
 
 // GetRecords returns all records by objectId.
 // Flag prepare allows to decode content of Raw* fields to direct fields, e.g. RawObject to Object.
-func (p *Plugin) GetRecords(objectId string, prepare bool) (changes []ChangeLog, err error) {
+func (p *Plugin) GetRecords(objectId, objectType string, prepare bool) (changes []ChangeLog, err error) {
 	defer func() {
 		if prepare {
 			for i := range changes {
@@ -52,12 +52,12 @@ func (p *Plugin) GetRecords(objectId string, prepare bool) (changes []ChangeLog,
 			}
 		}
 	}()
-	return changes, p.db.Where("object_id = ?", objectId).Find(&changes).Error
+	return changes, p.db.Where("object_id = ? AND object_type = ?", objectId, objectType).Find(&changes).Error
 }
 
 // GetLastRecord returns last by creation time (CreatedAt field) change log by provided object id.
 // Flag prepare allows to decode content of Raw* fields to direct fields, e.g. RawObject to Object.
-func (p *Plugin) GetLastRecord(objectId string, prepare bool) (change ChangeLog, err error) {
+func (p *Plugin) GetLastRecord(objectId, objectType string, prepare bool) (change ChangeLog, err error) {
 	defer func() {
 		if prepare {
 			if t, ok := p.opts.metaTypes[change.ObjectType]; ok {
@@ -74,5 +74,5 @@ func (p *Plugin) GetLastRecord(objectId string, prepare bool) (change ChangeLog,
 			}
 		}
 	}()
-	return change, p.db.Where("object_id = ?", objectId).Order("created_at DESC").Limit(1).Find(&change).Error
+	return change, p.db.Where("object_id = ? AND object_type = ?", objectId, objectType).Order("created_at DESC").Limit(1).Find(&change).Error
 }
