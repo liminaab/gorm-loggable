@@ -7,7 +7,8 @@ import (
 	"unicode"
 )
 
-const loggableTag = "gorm-loggable"
+const loggableDiffTag = "audit-diff"
+const loggableIgnoreChangeTag = "audit-ignore-change"
 
 func isEqual(item1, item2 interface{}, except ...string) bool {
 	except = StringMap(except, ToSnakeCase)
@@ -92,18 +93,41 @@ func isInStringSlice(what string, where []string) bool {
 	return false
 }
 
-func getLoggableFieldNames(value interface{}) []string {
+func getLoggableFieldNamesForDiff(value interface{}) []string {
+	return getLoggableFieldNames(loggableDiffTag, value)
+}
+
+func getLoggableFieldNamesForIgnore(value interface{}) []string {
+	return getLoggableFieldNames(loggableIgnoreChangeTag, value)
+}
+
+func getLoggableFieldNames(tag string, value interface{}) []string {
+
 	var names []string
 
 	t := reflect.TypeOf(value)
+	v := reflect.ValueOf(value)
+
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
+		v = v.Elem()
+	}
+
 	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		value, ok := field.Tag.Lookup(loggableTag)
+		typeField := t.Field(i)
+
+		if typeField.Anonymous {
+			valueField := v.Field(i)
+			names = append(names, getLoggableFieldNames(tag, valueField.Interface())...)
+			continue
+		}
+
+		value, ok := typeField.Tag.Lookup(tag)
 		if !ok || value != "true" {
 			continue
 		}
 
-		names = append(names, field.Name)
+		names = append(names, typeField.Name)
 	}
 
 	return names

@@ -40,7 +40,22 @@ func LazyUpdate(fields ...string) Option {
 // To access decoded object, e.g. `ReallyFunnyClient`, use type casting: `changeLog.Object.(ReallyFunnyClient)`.
 func RegObjectType(objectType string, objectStruct interface{}) Option {
 	return func(options *options) {
+		if options.objectTypes == nil {
+			options.objectTypes = make(map[string]reflect.Type)
+		}
 		options.objectTypes[objectType] = reflect.Indirect(reflect.ValueOf(objectStruct)).Type()
+	}
+}
+
+func RegObjectTypes(objectMap map[string]interface{}) Option {
+	return func(options *options) {
+		if options.objectTypes == nil {
+			options.objectTypes = make(map[string]reflect.Type)
+		}
+
+		for t, v := range objectMap {
+			options.objectTypes[t] = reflect.Indirect(reflect.ValueOf(v)).Type()
+		}
 	}
 }
 
@@ -52,6 +67,9 @@ func RegObjectType(objectType string, objectStruct interface{}) Option {
 // To access decoded object, e.g. `MyClientMeta`, use type casting: `changeLog.Meta.(MyClientMeta)`.
 func RegMetaType(objectType string, metaType interface{}) Option {
 	return func(options *options) {
+		if options.metaTypes == nil {
+			options.metaTypes = make(map[string]reflect.Type)
+		}
 		options.metaTypes[objectType] = reflect.Indirect(reflect.ValueOf(metaType)).Type()
 	}
 }
