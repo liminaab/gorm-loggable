@@ -106,9 +106,19 @@ func interfaceToString(v interface{}) string {
 	case string:
 		return val
 	case *string:
-		return *val
+		if val != nil {
+			return *val
+		} else {
+			return ""
+		}
+	case int64:
+		return fmt.Sprint(val)
 	case *int64:
-		return fmt.Sprint(*val)
+		if val != nil {
+			return fmt.Sprint(*val)
+		} else {
+			return ""
+		}
 	default:
 		return fmt.Sprint(v)
 	}
