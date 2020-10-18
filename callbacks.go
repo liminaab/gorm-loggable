@@ -116,7 +116,7 @@ func newChangeLog(scope *gorm.Scope, action string) (*ChangeLog, error) {
 		return nil, err
 	}
 
-	return &ChangeLog{
+	cl := &ChangeLog{
 		ID:         id,
 		Action:     action,
 		ObjectID:   interfaceToString(scope.PrimaryKeyValue()),
@@ -124,7 +124,15 @@ func newChangeLog(scope *gorm.Scope, action string) (*ChangeLog, error) {
 		RawObject:  string(rawObject),
 		RawMeta:    string(fetchChangeLogMeta(scope)),
 		RawDiff:    "null",
-	}, nil
+	}
+
+	val, ok := scope.Value.(Interface)
+	if ok {
+		iv := val.SecondaryIndexValue()
+		cl.ObjectID2 = iv
+	}
+
+	return cl, nil
 }
 
 // Writes new change log row to db.
