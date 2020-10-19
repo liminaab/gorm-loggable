@@ -20,18 +20,22 @@ type Interface interface {
 	isEnabled() bool
 	// enable/disable loggable
 	Enable(v bool)
+	//
+	SecondaryIndexValue() string
 }
 
 // LoggableModel is a root structure, which implement Interface.
 // Embed LoggableModel to your model so that Plugin starts tracking changes.
 type LoggableModel struct {
 	Disabled bool `sql:"-" json:"-"`
+	SecondaryIndex string `sql:"-" json:"-"`
 }
 
 func (LoggableModel) Meta() interface{} { return nil }
 func (LoggableModel) lock()             {}
 func (l LoggableModel) isEnabled() bool { return !l.Disabled }
 func (l *LoggableModel) Enable(v bool)   { l.Disabled = !v }
+func (l LoggableModel) SecondaryIndexValue() string { return "" }
 
 type Changelogs []ChangeLog
 
@@ -49,6 +53,7 @@ type ChangeLog struct {
 	// ID of tracking object.
 	// By this ID later you can find all object (database row) changes.
 	ObjectID string `gorm:"index" json:"object_id"`
+	ObjectID2 string `gorm:"index" json:"object_id2"`
 	// Reflect name of tracking object.
 	// It does not use package or module name, so
 	// it may be not unique when use multiple types from different packages but with the same name.

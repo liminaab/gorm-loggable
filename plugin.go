@@ -55,6 +55,28 @@ func (p *Plugin) GetRecords(objectId, objectType string, prepare bool) (changes 
 	return changes, p.db.Where("object_id = ? AND object_type = ?", objectId, objectType).Find(&changes).Error
 }
 
+func (p *Plugin) GetRecordsBySecondaryIndex(objectId, objectType string, prepare bool) (changes []ChangeLog, err error) {
+	defer func() {
+		if prepare {
+			for i := range changes {
+				if t, ok := p.opts.metaTypes[changes[i].ObjectType]; ok {
+					err = changes[i].prepareMeta(t)
+					if err != nil {
+						return
+					}
+				}
+				if t, ok := p.opts.objectTypes[changes[i].ObjectType]; ok {
+					err = changes[i].prepareObject(t)
+					if err != nil {
+						return
+					}
+				}
+			}
+		}
+	}()
+	return changes, p.db.Where("object_id2 = ? AND object_type = ?", objectId, objectType).Find(&changes).Error
+}
+
 // GetLastRecord returns last by creation time (CreatedAt field) change log by provided object id.
 // Flag prepare allows to decode content of Raw* fields to direct fields, e.g. RawObject to Object.
 func (p *Plugin) GetLastRecord(objectId, objectType string, prepare bool) (change ChangeLog, err error) {
